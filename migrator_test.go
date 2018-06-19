@@ -67,10 +67,10 @@ func TestMigrate(t *testing.T) {
 
 	connStr := "user=postgres dbname=kin_test sslmode=disable"
 	db, _ := sql.Open("postgres", connStr)
-	dbConn, _ := New(db)
+	migrator, _ := NewMigrator(db)
 
-	if err := dbConn.Migrate(migrationPath); err != nil {
-		t.Errorf("dbConn.Migrate(%s) = %v, want nil", migrationPath, err)
+	if err := migrator.Migrate(migrationPath); err != nil {
+		t.Errorf("migrator.Migrate(%s) = %v, want nil", migrationPath, err)
 		cleanupMigrationDir(migrationPath)
 	}
 
@@ -95,24 +95,16 @@ func TestMigrateRerun(t *testing.T) {
 
 	connStr := "user=postgres dbname=kin_test sslmode=disable"
 	db, _ := sql.Open("postgres", connStr)
-	dbConn, _ := New(db)
+	migrator, _ := NewMigrator(db)
 
-	if err := dbConn.Migrate(migrationPath); err != nil {
-		t.Errorf("dbConn.Migrate(%s) = %v, want nil", migrationPath, err)
+	if err := migrator.Migrate(migrationPath); err != nil {
+		t.Errorf("migrator.Migrate(%s) = %v, want nil", migrationPath, err)
 		cleanupMigrationDir(migrationPath)
 		return
 	}
 
-	want := `Error executing 1__create_baz.sql: pq: relation "baz" already exists`
-	err := dbConn.Migrate(migrationPath)
-	if err == nil {
-		t.Errorf("dbConn.Migrate(%s) = nil, want %s", migrationPath, want)
-		cleanupMigrationDir(migrationPath)
-		return
-	}
-
-	if err.Error() != want {
-		t.Errorf("dbConn.Migrate(%s) = %s, want %s", migrationPath, err.Error(), want)
+	if err := migrator.Migrate(migrationPath); err != nil {
+		t.Errorf("migrator.Migrate(%s) = %v, want nil", migrationPath, err)
 	}
 
 	cleanupMigrationDir(migrationPath)

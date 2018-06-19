@@ -11,9 +11,6 @@ type Transaction interface {
 	// Commit commits the transaction with the database.
 	Commit() error
 
-	// Migrate runs migrations.
-	Migrate(string) error
-
 	// Rollback the transaction when an error occurs.
 	Rollback() error
 
@@ -30,10 +27,6 @@ type transaction struct {
 
 func (t *transaction) Commit() error {
 	return t.tx.Commit()
-}
-
-func (t *transaction) Migrate(str string) error {
-	return errors.New("not implemented")
 }
 
 func (t *transaction) Rollback() error {
