@@ -41,6 +41,35 @@ func (rr *RowResult) ExtractJSON(column string, out interface{}) {
 	}
 }
 
+// ExtractBool gets the value in the dataset and returns a boolean.
+// If the value can't be extracted, it stores an error on the result and
+// prevents further extraction from occurring.
+func (rr *RowResult) ExtractBool(column string) bool {
+	if rr.err != nil {
+		return false
+	}
+
+	i, ok := rr.Data[column]
+	if !ok {
+		rr.err = fmt.Errorf("column %s not found in result set", column)
+		return false
+	}
+
+	b, ok := i.(*[]byte)
+	if !ok {
+		rr.err = fmt.Errorf("column %s (%v) could not be extracted as a bool", column, i)
+		return false
+	}
+
+	boolVal, err := strconv.ParseBool(string(*b))
+	if err != nil {
+		rr.err = fmt.Errorf("column %s (%+v) could not be extracted as a bool with error %v", column, b, err)
+		return false
+	}
+
+	return boolVal
+}
+
 // ExtractInt gets the value in the dataset and returns an integer.
 // If the value can't be extracted, it stores an error on the result and
 // prevents further extraction from occurring.
