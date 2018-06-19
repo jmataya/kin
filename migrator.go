@@ -64,6 +64,8 @@ func (m Migrator) Migrate(folderPath string) error {
 	if err := txn.Exec(sqlCreateSchemasTable); err != nil {
 		fmt.Printf("FAILED\n")
 		return fmt.Errorf("Error setting up schemas table: %v", err)
+	} else {
+		fmt.Printf("COMPLETED\n")
 	}
 
 	res, err := txn.Query("SELECT * FROM schemas").Run()
