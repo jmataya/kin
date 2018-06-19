@@ -11,8 +11,8 @@ type Transaction interface {
 	// Commit commits the transaction with the database.
 	Commit() error
 
-	// Migrate runs migrations.
-	Migrate(string) error
+	// Exec runs a query against the database that doesn't return any results.
+	Exec(query string, args ...interface{}) error
 
 	// Rollback the transaction when an error occurs.
 	Rollback() error
@@ -32,8 +32,9 @@ func (t *transaction) Commit() error {
 	return t.tx.Commit()
 }
 
-func (t *transaction) Migrate(str string) error {
-	return errors.New("not implemented")
+func (t *transaction) Exec(query string, args ...interface{}) error {
+	_, err := t.tx.Exec(query, args...)
+	return err
 }
 
 func (t *transaction) Rollback() error {

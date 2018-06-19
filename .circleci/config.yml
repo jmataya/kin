@@ -1,0 +1,25 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.9
+      - image: circleci/postgres:9.6
+        environment:
+          POSTGRES_USER: kin
+          POSTGRES_DB: kin_test
+    working_directory: /go/src/github.com/jmataya/kin
+    steps:
+      - checkout
+      - run: go get ./...
+      - run: go get github.com/lib/pq
+      - run:
+          name: Waiting for Postgres to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 5432 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for Postgres && exit 1
+      - run: DB_USER=kin DB_NAME=kin_test go test ./...
