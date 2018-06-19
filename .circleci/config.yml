@@ -11,6 +11,7 @@ jobs:
     steps:
       - checkout
       - run: go get ./...
+      - run: go get github.com/lib/pq
       - run:
           name: Waiting for Postgres to be ready
           command: |
