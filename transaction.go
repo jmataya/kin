@@ -11,6 +11,9 @@ type Transaction interface {
 	// Commit commits the transaction with the database.
 	Commit() error
 
+	// Exec runs a query against the database that doesn't return any results.
+	Exec(query string, args ...interface{}) error
+
 	// Rollback the transaction when an error occurs.
 	Rollback() error
 
@@ -27,6 +30,11 @@ type transaction struct {
 
 func (t *transaction) Commit() error {
 	return t.tx.Commit()
+}
+
+func (t *transaction) Exec(query string, args ...interface{}) error {
+	_, err := t.tx.Exec(query, args...)
+	return err
 }
 
 func (t *transaction) Rollback() error {

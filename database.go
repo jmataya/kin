@@ -8,6 +8,9 @@ import (
 // Database is an interface for interacting with the database. It abstracts
 // away managing connection pools and various other low-level bits.
 type Database interface {
+	// Exec runs a query against the database that doesn't return any results.
+	Exec(query string, args ...interface{}) error
+
 	// Query generates a new query to be executed at a later time.
 	Query(stmt string, params ...interface{}) *Query
 
@@ -26,6 +29,11 @@ func New(db *sql.DB) (Database, error) {
 
 type database struct {
 	db *sql.DB
+}
+
+func (d *database) Exec(query string, args ...interface{}) error {
+	_, err := d.db.Exec(query, args...)
+	return err
 }
 
 func (d *database) Query(stmt string, params ...interface{}) *Query {
