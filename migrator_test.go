@@ -65,7 +65,11 @@ func TestMigrate(t *testing.T) {
 		return
 	}
 
-	connStr := "user=postgres dbname=kin_test sslmode=disable"
+	connStr := os.Getenv("POSTGRES_URL")
+	if connStr == "" {
+		panic("POSTGRES_URL must not be empty")
+	}
+
 	db, _ := sql.Open("postgres", connStr)
 	migrator, _ := NewMigrator(db)
 
@@ -93,7 +97,10 @@ func TestMigrateRerun(t *testing.T) {
 		return
 	}
 
-	connStr := "user=postgres dbname=kin_test sslmode=disable"
+	connStr := os.Getenv("POSTGRES_URL")
+	if connStr == "" {
+		panic("POSTGRES_URL must not be empty")
+	}
 	db, _ := sql.Open("postgres", connStr)
 	migrator, _ := NewMigrator(db)
 

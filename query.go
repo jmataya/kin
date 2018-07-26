@@ -25,14 +25,14 @@ func (q Query) One() (*RowResult, error) {
 	return result.Rows[0], nil
 }
 
-// OneAndExtract executes the query and updates the model with the result.
-func (q Query) OneAndExtract(m Model) error {
+// OneAndExtract executes the query and updates the builder with the result.
+func (q Query) OneAndExtract(b Builder) error {
 	res, err := q.One()
 	if err != nil {
 		return err
 	}
 
-	return m.Build(res)
+	return buildOne(b, res)
 }
 
 // OneAndExtractFn executes the query and returns the model with the result
