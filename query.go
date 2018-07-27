@@ -1,8 +1,13 @@
 package kin
 
 import (
+	"database/sql"
 	"errors"
 )
+
+type databaseConnection interface {
+	Prepare(string) (*sql.Stmt, error)
+}
 
 // Query is a SQL query that has yet to be executed.
 type Query struct {
