@@ -14,9 +14,6 @@ type Database interface {
 	// Close terminates the database connection.
 	Close() error
 
-	// Exec runs a query against the database that doesn't return any results.
-	Exec(query string, args ...interface{}) error
-
 	// Query generates a new query to be executed at a later time.
 	Query(stmt string, params ...interface{}) *Query
 
@@ -49,11 +46,6 @@ type database struct {
 
 func (d *database) Close() error {
 	return d.db.Close()
-}
-
-func (d *database) Exec(query string, args ...interface{}) error {
-	_, err := d.db.Exec(query, args...)
-	return err
 }
 
 func (d *database) Query(stmt string, params ...interface{}) *Query {
