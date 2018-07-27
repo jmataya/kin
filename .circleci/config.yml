@@ -3,6 +3,8 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.9
+        environment:
+          KIN_POSTGRES_URL: postgresql://localhost:5432/kin_test?user=kin&sslmode=disable
       - image: circleci/postgres:9.6
         environment:
           POSTGRES_USER: kin
@@ -22,4 +24,4 @@ jobs:
               sleep 1
             done
             echo Failed waiting for Postgres && exit 1
-      - run: POSTGRES_URL="postgresql://localhost:5432/kin_test?user=kin&sslmode=disable" go test ./...
+      - run: POSTGRES_URL=$KIN_POSTGRES_URL go test ./...
