@@ -3,6 +3,7 @@
 [![CircleCI](https://img.shields.io/circleci/project/github/jmataya/kin.svg)](https://circle.com/gh/jmataya/kin)
 [![Go Report Card](https://goreportcard.com/badge/github.com/jmataya/kin)](https://goreportcard.com/report/github.com/jmataya/kin)
 [![Documentation](https://godoc.org/github.com/jmataya/kin?status.svg)](http://godoc.org/github.com/jmataya/kin)
+[![Coverage Status](https://coveralls.io/repos/github/jmataya/kin/badge.svg?branch=master)](https://coveralls.io/github/jmataya/kin?branch=master)
 
 *Kin is very experimental - don't use it for anything real!*
 
