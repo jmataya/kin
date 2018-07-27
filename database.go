@@ -27,6 +27,10 @@ func New(db *sql.DB) (Database, error) {
 		return nil, errors.New("db connection must be initialized")
 	}
 
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("unable to connect to database %v", err)
+	}
+
 	return &database{db: db}, nil
 }
 
