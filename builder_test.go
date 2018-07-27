@@ -1,12 +1,9 @@
 package kin
 
 import (
-	"database/sql"
 	"os"
 	"testing"
 	"time"
-
-	_ "github.com/lib/pq"
 )
 
 const (
@@ -60,14 +57,8 @@ func TestBuild(t *testing.T) {
 	}
 
 	connStr := os.Getenv("POSTGRES_URL")
-	if connStr == "" {
-		panic("POSTGRES_URL must not be empty")
-	}
-
-	sqlDB, _ := sql.Open("postgres", connStr)
-	defer sqlDB.Close()
-
-	migrator, _ := NewMigrator(sqlDB)
+	migrator, _ := NewMigratorConnection(connStr)
+	defer migrator.Close()
 
 	if err := migrator.Migrate(migrationPath); err != nil {
 		t.Errorf("migrator.Migrate(%s) = %v, want nil", migrationPath, err)
@@ -82,7 +73,8 @@ func TestBuild(t *testing.T) {
 
 	builder := new(builderModel)
 
-	db, _ := New(sqlDB)
+	db, _ := NewConnection(connStr)
+	defer db.Close()
 	err := db.Query(sqlInsertBuilder, name, attributes, isActive, createdAt).OneAndExtract(builder)
 	if err != nil {
 		t.Errorf("db.Query(...).OneAndExtract(...) = %v, want <nil>", err)

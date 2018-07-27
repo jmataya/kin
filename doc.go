@@ -58,7 +58,8 @@
 //		func main() {
 //			// Connect with a raw Postges URL.
 //			dbStr := "postgresql://localhost:5432/kin_test?user=kin"
-//			db, _ := kin.New(dbStr)
+//			db, _ := kin.NewConnection(dbStr)
+//			defer db.Close()
 //
 //			// For most operations, Kin leverages SQL.
 //			queryStr := "SELECT * FROM users WHERE id = $1"

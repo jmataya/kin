@@ -24,7 +24,7 @@ type Migrator struct {
 	db Database
 }
 
-// New creates a new Migrator around an existing DB connection.
+// NewMigrator creates a new Migrator around an existing DB connection.
 func NewMigrator(db *sql.DB) (*Migrator, error) {
 	dbi, err := New(db)
 	if err != nil {
@@ -32,6 +32,23 @@ func NewMigrator(db *sql.DB) (*Migrator, error) {
 	}
 
 	return &Migrator{db: dbi}, nil
+}
+
+// NewMigratorConnection initialized a DB connection and uses it to power
+// migrations.
+func NewMigratorConnection(dbURL string) (*Migrator, error) {
+	db, err := NewConnection(dbURL)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Migrator{db: db}, nil
+}
+
+// Close terminates the DB connection. Once this occurs there can be no future
+// migrations with this object.
+func (m Migrator) Close() error {
+	return m.db.Close()
 }
 
 // Migrate runs a series of database migrations.
@@ -64,9 +81,9 @@ func (m Migrator) Migrate(folderPath string) error {
 	if err := txn.Exec(sqlCreateSchemasTable); err != nil {
 		fmt.Printf("FAILED\n")
 		return fmt.Errorf("Error setting up schemas table: %v", err)
-	} else {
-		fmt.Printf("COMPLETED\n")
 	}
+
+	fmt.Printf("COMPLETED\n")
 
 	res, err := txn.Query("SELECT * FROM schemas").Run()
 	if err != nil {

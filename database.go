@@ -3,11 +3,17 @@ package kin
 import (
 	"database/sql"
 	"errors"
+	"fmt"
+
+	_ "github.com/lib/pq" // Needed to initialize the Postgres SQL driver.
 )
 
 // Database is an interface for interacting with the database. It abstracts
 // away managing connection pools and various other low-level bits.
 type Database interface {
+	// Close terminates the database connection.
+	Close() error
+
 	// Exec runs a query against the database that doesn't return any results.
 	Exec(query string, args ...interface{}) error
 
@@ -27,8 +33,22 @@ func New(db *sql.DB) (Database, error) {
 	return &database{db: db}, nil
 }
 
+// NewConnection initializes a new connection and creates a wrapper around it.
+func NewConnection(dbURL string) (Database, error) {
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create connection %v", err)
+	}
+
+	return New(db)
+}
+
 type database struct {
 	db *sql.DB
+}
+
+func (d *database) Close() error {
+	return d.db.Close()
 }
 
 func (d *database) Exec(query string, args ...interface{}) error {
