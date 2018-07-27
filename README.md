@@ -1,6 +1,6 @@
 # Kin
 
-[![CircleCI](https://circleci.com/gh/jmataya/kin.svg?style=svg)](https://circleci.com/gh/jmataya/kin)
+[![CircleCI](https://img.shields.io/circleci/project/github/jmataya/kin.svg)](https://circle.com/gh/jmataya/kin)
 [![Documentation](https://godoc.org/github.com/jmataya/kin?status.svg)](http://godoc.org/github.com/jmataya/kin)
 
 *Kin is very experimental - don't use it for anything real!*
