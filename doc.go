@@ -46,11 +46,11 @@
 //		// and the model. It's used internally by kin to wire everything up.
 //		func (u *user) Columns() []FieldBuilder {
 //			return []FieldBuilder{
-//				IntField{"id", &u.ID},
-//				StringField{"name", &u.Name},
-//				JSONField{"attributes", &u.Attributes},
-//				BoolField{"is_active", &u.IsActive},
-//				TimeField{"created_at", &u.CreatedAt},
+//				IntField("id", &u.ID),
+//				StringField("name", &u.Name),
+//				JSONField("attributes", &u.Attributes),
+//				BoolField("is_active", &u.IsActive),
+//				TimeField("created_at", &u.CreatedAt),
 //			}
 //		}
 //

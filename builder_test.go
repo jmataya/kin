@@ -37,11 +37,11 @@ type builderModel struct {
 
 func (b *builderModel) Columns() []FieldBuilder {
 	return []FieldBuilder{
-		IntField{"id", &b.ID},
-		StringField{"name", &b.Name},
-		JSONField{"attributes", &b.Attributes},
-		BoolField{"is_active", &b.IsActive},
-		TimeField{"created_at", &b.CreatedAt},
+		IntField("id", &b.ID),
+		StringField("name", &b.Name),
+		JSONField("attributes", &b.Attributes),
+		BoolField("is_active", &b.IsActive),
+		TimeField("created_at", &b.CreatedAt),
 	}
 }
 

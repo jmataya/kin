@@ -9,57 +9,72 @@ type FieldBuilder interface {
 	Set(res *RowResult)
 }
 
-// BoolField is a reference to an integer field.
-type BoolField struct {
+// BoolField creates a reference to a boolean field.
+func BoolField(fieldName string, field *bool) FieldBuilder {
+	return boolField{fieldName, field}
+}
+
+type boolField struct {
 	fieldName string
 	field     *bool
 }
 
-// Set assigns the wrapped field with the result from a row.
-func (b BoolField) Set(res *RowResult) {
+func (b boolField) Set(res *RowResult) {
 	*b.field = res.ExtractBool(b.fieldName)
 }
 
-// IntField is a reference to an integer field.
-type IntField struct {
+// IntField creates a reference to an integer field.
+func IntField(fieldName string, field *int) FieldBuilder {
+	return intField{fieldName, field}
+}
+
+type intField struct {
 	fieldName string
 	field     *int
 }
 
-// Set assigns the wrapped field with the result from a row.
-func (i IntField) Set(res *RowResult) {
+func (i intField) Set(res *RowResult) {
 	*i.field = res.ExtractInt(i.fieldName)
 }
 
-// JSONField is a reference to a string field.
-type JSONField struct {
+// JSONField creates a reference to a JSON field.
+func JSONField(fieldName string, field interface{}) FieldBuilder {
+	return jsonField{fieldName, field}
+}
+
+type jsonField struct {
 	fieldName string
 	field     interface{}
 }
 
-// Set assigns the wrapped field with the result from a row.
-func (j JSONField) Set(res *RowResult) {
+func (j jsonField) Set(res *RowResult) {
 	res.ExtractJSON(j.fieldName, j.field)
 }
 
-// StringField is a reference to a string field.
-type StringField struct {
+// StringField creates a reference to a string field.
+func StringField(fieldName string, field *string) FieldBuilder {
+	return stringField{fieldName, field}
+}
+
+type stringField struct {
 	fieldName string
 	field     *string
 }
 
-// Set assigns the wrapped field with the result from a row.
-func (s StringField) Set(res *RowResult) {
+func (s stringField) Set(res *RowResult) {
 	*s.field = res.ExtractString(s.fieldName)
 }
 
-// TimeField is a reference to a string field.
-type TimeField struct {
+// TimeField creates a reference to a string field.
+func TimeField(fieldName string, field *time.Time) FieldBuilder {
+	return timeField{fieldName, field}
+}
+
+type timeField struct {
 	fieldName string
 	field     *time.Time
 }
 
-// Set assigns the wrapped field with the result from a row.
-func (t TimeField) Set(res *RowResult) {
+func (t timeField) Set(res *RowResult) {
 	*t.field = res.ExtractTime(t.fieldName)
 }
