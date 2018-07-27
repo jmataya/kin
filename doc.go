@@ -33,7 +33,8 @@
 //		)
 //
 //		// user is a representation of a table called "users" with columns
-//		// id (int), name (text), attributes (jsonb), is_active (bool), and created_at (timestamp).
+//		// id (int), name (text), attributes (jsonb), is_active (bool), and
+//	  // created_at (timestamp).
 //		type user struct {
 //			ID         int
 //			Name       string
