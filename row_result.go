@@ -19,23 +19,13 @@ type RowResult struct {
 // ExtractJSON gets a JSON value from the dataset and unmarshals it into an
 // interface passed by the caller.
 func (rr *RowResult) ExtractJSON(column string, out interface{}) {
-	if rr.err != nil {
+	rawCol, err := rr.extractColumn(column)
+	if err != nil {
+		rr.err = err
 		return
 	}
 
-	i, ok := rr.Data[column]
-	if !ok {
-		rr.err = fmt.Errorf("column %s not found in result set", column)
-		return
-	}
-
-	b, ok := i.(*[]byte)
-	if !ok {
-		rr.err = fmt.Errorf("column %s (%v) could not be extracted", column, i)
-		return
-	}
-
-	if err := json.Unmarshal(*b, out); err != nil {
+	if err := json.Unmarshal(rawCol, out); err != nil {
 		rr.err = fmt.Errorf("column %s could not be unmarshalled with err %v", column, err)
 		return
 	}
@@ -45,25 +35,15 @@ func (rr *RowResult) ExtractJSON(column string, out interface{}) {
 // If the value can't be extracted, it stores an error on the result and
 // prevents further extraction from occurring.
 func (rr *RowResult) ExtractBool(column string) bool {
-	if rr.err != nil {
-		return false
-	}
-
-	i, ok := rr.Data[column]
-	if !ok {
-		rr.err = fmt.Errorf("column %s not found in result set", column)
-		return false
-	}
-
-	b, ok := i.(*[]byte)
-	if !ok {
-		rr.err = fmt.Errorf("column %s (%v) could not be extracted as a bool", column, i)
-		return false
-	}
-
-	boolVal, err := strconv.ParseBool(string(*b))
+	rawCol, err := rr.extractColumn(column)
 	if err != nil {
-		rr.err = fmt.Errorf("column %s (%+v) could not be extracted as a bool with error %v", column, b, err)
+		rr.err = err
+		return false
+	}
+
+	boolVal, err := strconv.ParseBool(string(rawCol))
+	if err != nil {
+		rr.err = fmt.Errorf("column %s (%+v) could not be extracted as a bool with error %v", column, rawCol, err)
 		return false
 	}
 
@@ -74,25 +54,15 @@ func (rr *RowResult) ExtractBool(column string) bool {
 // If the value can't be extracted, it stores an error on the result and
 // prevents further extraction from occurring.
 func (rr *RowResult) ExtractInt(column string) int {
-	if rr.err != nil {
-		return 0
-	}
-
-	i, ok := rr.Data[column]
-	if !ok {
-		rr.err = fmt.Errorf("column %s not found in result set", column)
-		return 0
-	}
-
-	b, ok := i.(*[]byte)
-	if !ok {
-		rr.err = fmt.Errorf("column %s (%v) could not be extracted as an int", column, i)
-		return 0
-	}
-
-	num, err := strconv.ParseInt(string(*b), 10, 64)
+	rawCol, err := rr.extractColumn(column)
 	if err != nil {
-		rr.err = fmt.Errorf("column %s (%+v) could not be extracted as an int with error %v", column, b, err)
+		rr.err = err
+		return 0
+	}
+
+	num, err := strconv.ParseInt(string(rawCol), 10, 64)
+	if err != nil {
+		rr.err = fmt.Errorf("column %s (%+v) could not be extracted as an int with error %v", column, rawCol, err)
 		return 0
 	}
 
@@ -103,23 +73,13 @@ func (rr *RowResult) ExtractInt(column string) int {
 // If the value can't be extracted, it stores an error on the result and
 // prevents further extraction from occurring.
 func (rr *RowResult) ExtractString(column string) string {
-	if rr.err != nil {
+	rawCol, err := rr.extractColumn(column)
+	if err != nil {
+		rr.err = err
 		return ""
 	}
 
-	s, ok := rr.Data[column]
-	if !ok {
-		rr.err = fmt.Errorf("column %s not found in result set", column)
-		return ""
-	}
-
-	b, ok := s.(*[]byte)
-	if !ok {
-		rr.err = fmt.Errorf("column %s (%v) could not be extracted as a string", column, s)
-		return ""
-	}
-
-	return string(*b)
+	return string(rawCol)
 }
 
 // Err returns any aggregrated errors.
@@ -158,24 +118,14 @@ func newRowResult(row *sql.Rows) (*RowResult, error) {
 // If the value can't be extracted, it stores an error on the result and
 // prevents further extraction from occurring.
 func (rr *RowResult) ExtractTime(column string) time.Time {
-	if rr.err != nil {
-		return time.Now()
-	}
-
-	i, ok := rr.Data[column]
-	if !ok {
-		rr.err = fmt.Errorf("column %s not found in result set", column)
-		return time.Now()
-	}
-
-	b, ok := i.(*[]byte)
-	if !ok {
-		rr.err = fmt.Errorf("column %s (%v) could not be extracted as an int", column, i)
+	rawCol, err := rr.extractColumn(column)
+	if err != nil {
+		rr.err = err
 		return time.Now()
 	}
 
 	dateFormat := "2006-01-02T15:04:05.999999Z"
-	dateString := string(*b)
+	dateString := string(rawCol)
 	t, err := time.Parse(dateFormat, dateString)
 	if err != nil {
 		rr.err = fmt.Errorf("column %s (%s) could not be extracted as a timestamp with error %v", column, dateString, err)
@@ -183,4 +133,22 @@ func (rr *RowResult) ExtractTime(column string) time.Time {
 	}
 
 	return t
+}
+
+func (rr *RowResult) extractColumn(column string) ([]byte, error) {
+	if rr.err != nil {
+		return nil, rr.err
+	}
+
+	col, ok := rr.Data[column]
+	if !ok {
+		return nil, fmt.Errorf("column %s not found in result set", column)
+	}
+
+	b, ok := col.(*[]byte)
+	if !ok {
+		return nil, fmt.Errorf("column %s (%v) could not be extracted", column, col)
+	}
+
+	return *b, nil
 }
