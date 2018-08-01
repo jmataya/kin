@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	_ "github.com/jmataya/renv/autoload"
 	_ "github.com/lib/pq"
 )
 
@@ -70,6 +71,11 @@ func TestDatabaseBadConnectionURL(t *testing.T) {
 
 func TestDatabaseTransactionError(t *testing.T) {
 	connStr := os.Getenv("POSTGRES_URL")
+	if connStr == "" {
+		t.Error("POSTGRES_URL is empty")
+		return
+	}
+
 	db, _ := NewConnection(connStr)
 	db.Close()
 

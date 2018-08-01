@@ -13,3 +13,6 @@
 
 # Vendored code
 vendor/
+
+# Environments should be local-only.
+.env

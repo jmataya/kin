@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	_ "github.com/jmataya/renv/autoload"
 	_ "github.com/lib/pq"
 )
 
@@ -67,6 +68,11 @@ func TestMigrate(t *testing.T) {
 
 	connStr := os.Getenv("POSTGRES_URL")
 	if connStr == "" {
+		t.Error("POSTGRES_URL is empty")
+		return
+	}
+
+	if connStr == "" {
 		panic("POSTGRES_URL must not be empty")
 	}
 
@@ -99,8 +105,10 @@ func TestMigrateRerun(t *testing.T) {
 
 	connStr := os.Getenv("POSTGRES_URL")
 	if connStr == "" {
-		panic("POSTGRES_URL must not be empty")
+		t.Error("POSTGRES_URL is empty")
+		return
 	}
+
 	db, _ := sql.Open("postgres", connStr)
 	migrator, _ := NewMigrator(db)
 

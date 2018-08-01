@@ -4,6 +4,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	_ "github.com/jmataya/renv/autoload"
 )
 
 const (
@@ -57,7 +59,15 @@ func TestBuild(t *testing.T) {
 	}
 
 	connStr := os.Getenv("POSTGRES_URL")
-	migrator, _ := NewMigratorConnection(connStr)
+	if connStr == "" {
+		t.Error("POSTGRES_URL is empty")
+		return
+	}
+
+	migrator, err := NewMigratorConnection(connStr)
+	if err != nil {
+		panic(err)
+	}
 	defer migrator.Close()
 
 	if err := migrator.Migrate(migrationPath); err != nil {
@@ -75,7 +85,7 @@ func TestBuild(t *testing.T) {
 
 	db, _ := NewConnection(connStr)
 	defer db.Close()
-	err := db.Query(sqlInsertBuilder, name, attributes, isActive, createdAt).OneAndExtract(builder)
+	err = db.Query(sqlInsertBuilder, name, attributes, isActive, createdAt).OneAndExtract(builder)
 	if err != nil {
 		t.Errorf("db.Query(...).OneAndExtract(...) = %v, want <nil>", err)
 		return
