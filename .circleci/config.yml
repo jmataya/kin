@@ -3,8 +3,6 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.9
-        environment:
-          KIN_POSTGRES_URL: postgresql://localhost:5432/kin_test?user=kin&sslmode=disable
       - image: circleci/postgres:9.6
         environment:
           POSTGRES_USER: kin
@@ -16,6 +14,7 @@ jobs:
       - run: dep ensure
       - run: go get golang.org/x/tools/cmd/cover
       - run: go get github.com/mattn/goveralls
+      - run: echo "POSTGRES_URL=postgresql://localhost:5432/kin_test?user=kin&sslmode=disable" > .env
       - run:
           name: Waiting for Postgres to be ready
           command: |
@@ -26,5 +25,5 @@ jobs:
               sleep 1
             done
             echo Failed waiting for Postgres && exit 1
-      - run: POSTGRES_URL=$KIN_POSTGRES_URL go test -v -covermode=count -coverprofile=coverage.out
+      - run: go test -v -covermode=count -coverprofile=coverage.out
       - run: goveralls -coverprofile=coverage.out -service=circle-ci -repotoken $COVERALLS_TOKEN
