@@ -2,19 +2,18 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.9
+      - image: cimg/golang:1.16
       - image: circleci/postgres:9.6
         environment:
           POSTGRES_USER: kin
+          POSTGRES_PASSWORD: kin
           POSTGRES_DB: kin_test
     working_directory: /go/src/github.com/jmataya/kin
     steps:
       - checkout
-      - run: go get -u github.com/golang/dep/cmd/dep
-      - run: dep ensure
       - run: go get golang.org/x/tools/cmd/cover
       - run: go get github.com/mattn/goveralls
-      - run: echo "POSTGRES_URL=postgresql://localhost:5432/kin_test?user=kin&sslmode=disable" > .env
+      - run: echo "POSTGRES_URL=postgresql://localhost:5432/kin_test?user=kin&password=kin&sslmode=disable" > .env
       - run:
           name: Waiting for Postgres to be ready
           command: |
