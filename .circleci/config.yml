@@ -8,7 +8,6 @@ jobs:
           POSTGRES_USER: kin
           POSTGRES_PASSWORD: kin
           POSTGRES_DB: kin_test
-    working_directory: /go/src/github.com/jmataya/kin
     steps:
       - checkout
       - run: go get golang.org/x/tools/cmd/cover
