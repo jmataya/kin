@@ -23,6 +23,20 @@ func (b boolField) Set(res *RowResult) {
 	*b.field = res.ExtractBool(b.fieldName)
 }
 
+// DecimalField creates a reference to a field for a floating point number.
+func DecimalField(fieldName string, field *float64) FieldBuilder {
+	return decimalField{fieldName, field}
+}
+
+type decimalField struct {
+	fieldName string
+	field     *float64
+}
+
+func (d decimalField) Set(res *RowResult) {
+	*d.field = res.ExtractDecimal(d.fieldName)
+}
+
 // IntField creates a reference to an integer field.
 func IntField(fieldName string, field *int) FieldBuilder {
 	return intField{fieldName, field}

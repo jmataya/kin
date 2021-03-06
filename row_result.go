@@ -50,6 +50,25 @@ func (rr *RowResult) ExtractBool(column string) bool {
 	return boolVal
 }
 
+// ExtractDecimal gets the value in the dataset and returns an integer.
+// If the value can't be extracted, it stores an error on the result and
+// prevents further extraction from occurring.
+func (rr *RowResult) ExtractDecimal(column string) float64 {
+	rawCol, err := rr.extractColumn(column)
+	if err != nil {
+		rr.err = err
+		return 0
+	}
+
+	num, err := strconv.ParseFloat(string(rawCol), 64)
+	if err != nil {
+		rr.err = fmt.Errorf("column %s (%+v) could not be extracted as a float with error %v", column, rawCol, err)
+		return 0
+	}
+
+	return num
+}
+
 // ExtractInt gets the value in the dataset and returns an integer.
 // If the value can't be extracted, it stores an error on the result and
 // prevents further extraction from occurring.
