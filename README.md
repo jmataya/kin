@@ -53,13 +53,13 @@ type user struct {
 
 // Columns defines the mapping between database columns, their type,
 // and the model. It's used internally by kin to wire everything up.
-func (u *user) Columns() []FieldBuilder {
+func (u *user) Columns() []kin.FieldBuilder {
         return []FieldBuilder{
-               IntField("id", &u.ID),
-               StringField("name", &u.Name),
-               JSONField("attributes", &u.Attributes),
-               BoolField("is_active", &u.IsActive),
-               TimeField("created_at", &u.CreatedAt),
+               kin.IntField("id", &u.ID),
+               kin.StringField("name", &u.Name),
+               kin.JSONField("attributes", &u.Attributes),
+               kin.BoolField("is_active", &u.IsActive),
+               kin.TimeField("created_at", &u.CreatedAt),
        }
 }
 
