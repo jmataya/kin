@@ -2,6 +2,7 @@ package kin
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -84,5 +85,45 @@ func TestDatabaseTransactionError(t *testing.T) {
 		t.Errorf("NewConnection(%s) = <nil>, want %s", connStr, want)
 	} else if err.Error() != want {
 		t.Errorf("NewConnection(%s) = %v, want %s", connStr, err, want)
+	}
+}
+
+type testModel struct {
+	ID   int
+	Name string
+}
+
+func (tm testModel) TableName() string {
+	return "test_model"
+}
+
+func (tm testModel) Columns() []FieldBuilder {
+	return []FieldBuilder{
+		IntField("id", &tm.ID),
+		StringField("name", &tm.Name),
+	}
+}
+
+func TestInsert(t *testing.T) {
+	tm := testModel{Name: "Donkey Hote"}
+	db := &database{}
+	q := db.Insert(tm)
+
+	wantStmt := "INSERT INTO test_model (id, name) VALUES ($1, $2) RETURNING *"
+	if q.stmt != wantStmt {
+		t.Errorf("q.stmt = %s, want %s", q.stmt, wantStmt)
+	}
+
+	wantParams := []interface{}{0, "Donkey Hote"}
+	if len(q.params) != len(wantParams) {
+		fmt.Printf("qparams = %+v\n", q.params)
+		t.Errorf("len(q.params) = %d, want %d", len(q.params), len(wantParams))
+		return
+	}
+
+	for i, param := range q.params {
+		if param != wantParams[i] {
+			t.Errorf("q.params[%d] = %v, want %v", i, param, wantParams[i])
+		}
 	}
 }

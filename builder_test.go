@@ -103,7 +103,7 @@ func TestBuild(t *testing.T) {
 		t.Errorf("builder.IsActive = %v, want %v", builder.IsActive, isActive)
 	}
 
-	if builder.CreatedAt.Equal(createdAt) {
+	if !builder.CreatedAt.Equal(createdAt) {
 		t.Errorf("builder.CreatedAt = %v, want %v", builder.CreatedAt, createdAt)
 	}
 

@@ -52,6 +52,27 @@ func (d *database) Close() error {
 	return d.db.Close()
 }
 
+func (d *database) Insert(m Model) *Query {
+	var columns string
+	var values string
+	var params []interface{}
+
+	for _, column := range m.Columns() {
+		separator := ""
+		if len(params) > 0 {
+			separator = ", "
+		}
+
+		params = append(params, column.Get())
+		columns = fmt.Sprintf("%s%s%s", columns, separator, column.FieldName())
+		values = fmt.Sprintf("%s%s$%d", values, separator, len(params))
+	}
+
+	stmt := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s) RETURNING *", m.TableName(), columns, values)
+
+	return d.Query(stmt, params...)
+}
+
 func (d *database) Query(stmt string, params ...interface{}) *Query {
 	return &Query{
 		db:     d.db,

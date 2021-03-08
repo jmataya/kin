@@ -1,10 +1,18 @@
 package kin
 
-import "time"
+import (
+	"time"
+)
 
 // FieldBuilder is an interface for building up fields from a database
 // row result.
 type FieldBuilder interface {
+	// Get retrieves the current value of the field.
+	Get() interface{}
+
+	// FieldName returns the name of the field.
+	FieldName() string
+
 	// Set assigns the wrapped field with the result from a row.
 	Set(res *RowResult)
 }
@@ -17,6 +25,14 @@ func BoolField(fieldName string, field *bool) FieldBuilder {
 type boolField struct {
 	fieldName string
 	field     *bool
+}
+
+func (b boolField) FieldName() string {
+	return b.fieldName
+}
+
+func (b boolField) Get() interface{} {
+	return *b.field
 }
 
 func (b boolField) Set(res *RowResult) {
@@ -33,6 +49,14 @@ type decimalField struct {
 	field     *float64
 }
 
+func (d decimalField) FieldName() string {
+	return d.fieldName
+}
+
+func (d decimalField) Get() interface{} {
+	return *d.field
+}
+
 func (d decimalField) Set(res *RowResult) {
 	*d.field = res.ExtractDecimal(d.fieldName)
 }
@@ -45,6 +69,14 @@ func IntField(fieldName string, field *int) FieldBuilder {
 type intField struct {
 	fieldName string
 	field     *int
+}
+
+func (i intField) FieldName() string {
+	return i.fieldName
+}
+
+func (i intField) Get() interface{} {
+	return *i.field
 }
 
 func (i intField) Set(res *RowResult) {
@@ -61,6 +93,14 @@ type jsonField struct {
 	field     interface{}
 }
 
+func (j jsonField) FieldName() string {
+	return j.fieldName
+}
+
+func (j jsonField) Get() interface{} {
+	return j.field
+}
+
 func (j jsonField) Set(res *RowResult) {
 	res.ExtractJSON(j.fieldName, j.field)
 }
@@ -75,6 +115,14 @@ type stringField struct {
 	field     *string
 }
 
+func (s stringField) FieldName() string {
+	return s.fieldName
+}
+
+func (s stringField) Get() interface{} {
+	return *s.field
+}
+
 func (s stringField) Set(res *RowResult) {
 	*s.field = res.ExtractString(s.fieldName)
 }
@@ -87,6 +135,14 @@ func TimeField(fieldName string, field *time.Time) FieldBuilder {
 type timeField struct {
 	fieldName string
 	field     *time.Time
+}
+
+func (t timeField) FieldName() string {
+	return t.fieldName
+}
+
+func (t timeField) Get() interface{} {
+	return *t.field
 }
 
 func (t timeField) Set(res *RowResult) {
