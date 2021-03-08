@@ -2,10 +2,10 @@ package kin
 
 import (
 	"database/sql"
-	"fmt"
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	_ "github.com/jmataya/renv/autoload"
 	_ "github.com/lib/pq"
@@ -105,7 +105,7 @@ func (tm testModel) Columns() []FieldBuilder {
 }
 
 func TestInsert(t *testing.T) {
-	tm := testModel{Name: "Donkey Hote"}
+	tm := testModel{ID: 1, Name: "Donkey Hote"}
 	db := &database{}
 	q := db.Insert(tm)
 
@@ -114,9 +114,73 @@ func TestInsert(t *testing.T) {
 		t.Errorf("q.stmt = %s, want %s", q.stmt, wantStmt)
 	}
 
-	wantParams := []interface{}{0, "Donkey Hote"}
+	wantParams := []interface{}{1, "Donkey Hote"}
 	if len(q.params) != len(wantParams) {
-		fmt.Printf("qparams = %+v\n", q.params)
+		t.Errorf("len(q.params) = %d, want %d", len(q.params), len(wantParams))
+		return
+	}
+
+	for i, param := range q.params {
+		if param != wantParams[i] {
+			t.Errorf("q.params[%d] = %v, want %v", i, param, wantParams[i])
+		}
+	}
+}
+
+type testModelTime struct {
+	ID        int
+	Name      string
+	CreatedAt time.Time
+}
+
+func (tm testModelTime) TableName() string {
+	return "test_model"
+}
+
+func (tm testModelTime) Columns() []FieldBuilder {
+	return []FieldBuilder{
+		IntField("id", &tm.ID),
+		StringField("name", &tm.Name),
+		TimeField("created_at", &tm.CreatedAt),
+	}
+}
+
+func TestInsertUnsetTime(t *testing.T) {
+	tm := testModelTime{Name: "Donkey Hote"}
+	db := &database{}
+	q := db.Insert(tm)
+
+	wantStmt := "INSERT INTO test_model (name) VALUES ($1) RETURNING *"
+	if q.stmt != wantStmt {
+		t.Errorf("q.stmt = %s, want %s", q.stmt, wantStmt)
+	}
+
+	wantParams := []interface{}{"Donkey Hote"}
+	if len(q.params) != len(wantParams) {
+		t.Errorf("len(q.params) = %d, want %d", len(q.params), len(wantParams))
+		return
+	}
+
+	for i, param := range q.params {
+		if param != wantParams[i] {
+			t.Errorf("q.params[%d] = %v, want %v", i, param, wantParams[i])
+		}
+	}
+}
+
+func TestInsertSetTime(t *testing.T) {
+	createdAt := time.Now()
+	tm := testModelTime{Name: "Donkey Hote", CreatedAt: createdAt}
+	db := &database{}
+	q := db.Insert(tm)
+
+	wantStmt := "INSERT INTO test_model (name, created_at) VALUES ($1, $2) RETURNING *"
+	if q.stmt != wantStmt {
+		t.Errorf("q.stmt = %s, want %s", q.stmt, wantStmt)
+	}
+
+	wantParams := []interface{}{"Donkey Hote", createdAt}
+	if len(q.params) != len(wantParams) {
 		t.Errorf("len(q.params) = %d, want %d", len(q.params), len(wantParams))
 		return
 	}

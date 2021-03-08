@@ -58,6 +58,10 @@ func (d *database) Insert(m Model) *Query {
 	var params []interface{}
 
 	for _, column := range m.Columns() {
+		if !column.IsSet() {
+			continue
+		}
+
 		separator := ""
 		if len(params) > 0 {
 			separator = ", "

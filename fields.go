@@ -13,6 +13,9 @@ type FieldBuilder interface {
 	// FieldName returns the name of the field.
 	FieldName() string
 
+	// IsSet returns true if the value inside the field is in its non-zero position.
+	IsSet() bool
+
 	// Set assigns the wrapped field with the result from a row.
 	Set(res *RowResult)
 }
@@ -33,6 +36,11 @@ func (b boolField) FieldName() string {
 
 func (b boolField) Get() interface{} {
 	return *b.field
+}
+
+func (b boolField) IsSet() bool {
+	// Returning false for a boolean is kind of ridiculous.
+	return true
 }
 
 func (b boolField) Set(res *RowResult) {
@@ -57,6 +65,10 @@ func (d decimalField) Get() interface{} {
 	return *d.field
 }
 
+func (d decimalField) IsSet() bool {
+	return *d.field != 0.0
+}
+
 func (d decimalField) Set(res *RowResult) {
 	*d.field = res.ExtractDecimal(d.fieldName)
 }
@@ -77,6 +89,10 @@ func (i intField) FieldName() string {
 
 func (i intField) Get() interface{} {
 	return *i.field
+}
+
+func (i intField) IsSet() bool {
+	return *i.field != 0
 }
 
 func (i intField) Set(res *RowResult) {
@@ -101,6 +117,10 @@ func (j jsonField) Get() interface{} {
 	return j.field
 }
 
+func (j jsonField) IsSet() bool {
+	return j.field != nil
+}
+
 func (j jsonField) Set(res *RowResult) {
 	res.ExtractJSON(j.fieldName, j.field)
 }
@@ -123,6 +143,10 @@ func (s stringField) Get() interface{} {
 	return *s.field
 }
 
+func (s stringField) IsSet() bool {
+	return *s.field != ""
+}
+
 func (s stringField) Set(res *RowResult) {
 	*s.field = res.ExtractString(s.fieldName)
 }
@@ -143,6 +167,10 @@ func (t timeField) FieldName() string {
 
 func (t timeField) Get() interface{} {
 	return *t.field
+}
+
+func (t timeField) IsSet() bool {
+	return t.field.IsZero() == false
 }
 
 func (t timeField) Set(res *RowResult) {
