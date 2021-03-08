@@ -51,6 +51,23 @@ func (q Query) OneAndExtractFn(buildFn func(*RowResult) error) error {
 	return buildFn(res)
 }
 
+// ExtractFn executes the query and iterates over all rows to extract
+// the result.
+func (q Query) ExtractFn(buildFn func(*RowResult) error) error {
+	result, err := q.Run()
+	if err != nil {
+		return err
+	}
+
+	for _, row := range result.Rows {
+		if err := buildFn(row); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // Run executes the query and returns the results.
 func (q Query) Run() (*Result, error) {
 	stmt, err := q.db.Prepare(q.stmt)
