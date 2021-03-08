@@ -14,6 +14,9 @@ type Database interface {
 	// Close terminates the database connection.
 	Close() error
 
+	// Insert generates an insert query for a model.
+	Insert(m Model) *Query
+
 	// Query generates a new query to be executed at a later time.
 	Query(stmt string, params ...interface{}) *Query
 
